@@ -44,21 +44,27 @@ unsigned int Sigma1(unsigned int x) {
 }
 
 unsigned int Hash256() {
-	unsigned int fixed_H[8] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
+	unsigned int fixed_H[8] = { 0x00, };
 	unsigned int H[8] = { 0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19 };
 	unsigned int M[16] = { 0x61626380, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000018 };
-	unsigned int W[64] = { 0x00000000 };
-	unsigned int N = 1;
+	unsigned int M2[32] = { 0x61626364 ,0x62636465 ,0x63646566 ,0x64656667 ,0x65666768 ,0x66676869 ,0x6768696a ,0x68696a6b
+,0x696a6b6c ,0x6a6b6c6d ,0x6b6c6d6e ,0x6c6d6e6f ,0x6d6e6f70 ,0x6e6f7071 ,0x80000000 ,0x00000000
+,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000
+,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x000001c0 };
+	unsigned int N = 2;
 	unsigned int T1, T2;
-	for (int i = 0; i < 16; i++) {
-		W[i] = M[i];
-	}
-	for (int k = 16; k < 64; k++) {
-		W[k] = Sigma1(W[k - 2]) + W[k - 7] + Sigma0(W[k - 15]) + W[k - 16];
-	}
 	unsigned int a, b, c, d, e, f, g, h;
+	unsigned int W[64] = { 0x00000000, };
 	for (int i = 0; i < N; i++) {
+		for (int m = 0; m < 8; m++)
+			fixed_H[m] = H[m];
+		for (int m = 0; m < 16; m++) {
+			W[m] = M2[m+(16*i)];
+		}
+		for (int k = 16; k < 64; k++) {
+			W[k] = Sigma1(W[k - 2]) + W[k - 7] + Sigma0(W[k - 15]) + W[k - 16];
+		}
 		a = H[0];
 		b = H[1];
 		c = H[2];
