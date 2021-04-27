@@ -2,4 +2,5 @@
 
 void main() {
 	Hash256();
+	Hash512();
 }
