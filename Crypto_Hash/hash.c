@@ -59,7 +59,7 @@ unsigned long long R_512(unsigned long long x, unsigned long long n) {
 
 unsigned long long S_512(unsigned long long x, unsigned long long n) {
 	unsigned long long temp = x;
-	return (temp >> n) ^ (x << (32 - n));
+	return (temp >> n) ^ (x << (64 - n));
 }
 
 unsigned long long Ch_512(unsigned long long x, unsigned long long y, unsigned long long z) {
@@ -91,11 +91,15 @@ unsigned int Hash512() {
 	unsigned long long H[8] = { 0x6a09e667f3bcc908, 0xbb67ae8584caa73b, 0x3c6ef372fe94f82b, 0xa54ff53a5f1d36f1, 0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179 };
 	unsigned long long M[16] = { 0x6162638000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
 	 0x0000000000000000,  0x0000000000000000,  0x0000000000000000,  0x0000000000000000,  0x0000000000000000,  0x0000000000000000,  0x0000000000000000,  0x0000000000000018 };
-	unsigned int M2[32] = { 0x61626364 ,0x62636465 ,0x63646566 ,0x64656667 ,0x65666768 ,0x66676869 ,0x6768696a ,0x68696a6b
-,0x696a6b6c ,0x6a6b6c6d ,0x6b6c6d6e ,0x6c6d6e6f ,0x6d6e6f70 ,0x6e6f7071 ,0x80000000 ,0x00000000
-,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000
-,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x00000000 ,0x000001c0 };
-	unsigned int N = 1;
+	unsigned long long M2[32] = { 0x6162636465666768, 0x6263646566676869, 0x636465666768696a, 0x6465666768696a6b,
+0x65666768696a6b6c, 0x666768696a6b6c6d, 0x6768696a6b6c6d6e, 0x68696a6b6c6d6e6f,
+0x696a6b6c6d6e6f70, 0x6a6b6c6d6e6f7071, 0x6b6c6d6e6f707172, 0x6c6d6e6f70717273,
+0x6d6e6f7071727374, 0x6e6f707172737475, 0x8000000000000000, 0x0000000000000000,
+0x0000000000000000, 0x0000000000000000 , 0x0000000000000000 , 0x0000000000000000,
+0x0000000000000000 , 0x0000000000000000 , 0x0000000000000000 , 0x0000000000000000,
+0x0000000000000000 , 0x0000000000000000 , 0x0000000000000000 , 0x0000000000000000,
+0x0000000000000000 , 0x0000000000000000 , 0x0000000000000000 , 0x0000000000000380};
+	unsigned int N = 2;
 	unsigned long long T1, T2;
 	unsigned long long a, b, c, d, e, f, g, h;
 	unsigned long long  W[80] = { 0x0000000000000000, };
@@ -103,9 +107,9 @@ unsigned int Hash512() {
 		for (int m = 0; m < 8; m++)
 			fixed_H[m] = H[m];
 		for (int m = 0; m < 16; m++) {
-			W[m] = M[m + (16 * i)];
+			W[m] = M2[m + (16 * i)];
 		}
-		for (int k = 16; k < 79; k++) {
+		for (int k = 16; k < 80; k++) {
 			W[k] = Sigma1_512(W[k - 2]) + W[k - 7] + Sigma0_512(W[k - 15]) + W[k - 16];
 		}
 		a = H[0];
@@ -116,7 +120,7 @@ unsigned int Hash512() {
 		f = H[5];
 		g = H[6];
 		h = H[7];
-		for (int j = 0; j < 64; j++) {
+		for (int j = 0; j < 80; j++) {
 			T1 = h + Sum1_512(e) + Ch_512(e, f, g) + Hash_KK[j] + W[j];
 			T2 = Sum0_512(a) + Maj_512(a, b, c);
 			h = g;
@@ -138,7 +142,7 @@ unsigned int Hash512() {
 		H[7] = h + fixed_H[7];
 	}
 	for (int t = 0; t < 8; t++)
-		printf("%16x ", H[t]);
+		printf("%16llx ", H[t]);
 	printf("\n");
 
 	return 0;
